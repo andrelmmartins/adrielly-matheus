@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" fill="none">
+  <defs>
+    <radialGradient id="watercolor" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#F5D1C3" stop-opacity="0.9"/>
+      <stop offset="50%" stop-color="#FFB6A3" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#C4D7D1" stop-opacity="0.2"/>
+    </radialGradient>
+    <linearGradient id="petal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFB6A3"/>
+      <stop offset="100%" stop-color="#F5D1C3"/>
+    </linearGradient>
+  </defs>
+  <circle cx="200" cy="200" r="180" fill="url(#watercolor)"/>
+  <ellipse cx="200" cy="180" rx="55" ry="70" fill="url(#petal)" opacity="0.85" transform="rotate(-20 200 180)"/>
+  <ellipse cx="160" cy="210" rx="50" ry="65" fill="url(#petal)" opacity="0.75" transform="rotate(30 160 210)"/>
+  <ellipse cx="240" cy="210" rx="50" ry="65" fill="url(#petal)" opacity="0.75" transform="rotate(-30 240 210)"/>
+  <ellipse cx="200" cy="240" rx="48" ry="60" fill="url(#petal)" opacity="0.8"/>
+  <circle cx="200" cy="200" r="22" fill="#7292A6" opacity="0.6"/>
+  <path d="M80 120 Q100 80 130 100" stroke="#C4D7D1" stroke-width="3" fill="none" opacity="0.6"/>
+  <path d="M320 280 Q300 320 270 300" stroke="#C4D7D1" stroke-width="3" fill="none" opacity="0.6"/>
+</svg>
