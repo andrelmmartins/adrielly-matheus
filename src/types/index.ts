@@ -16,3 +16,7 @@ export interface RsvpRecord extends RsvpInput {
   id: string;
   submittedAt: string;
 }
+
+export interface ReserveGiftInput {
+  name: string;
+}

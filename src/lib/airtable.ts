@@ -13,9 +13,20 @@ interface AirtableAttachment {
 interface AirtableGiftFields {
   Nome?: string;
   Foto?: AirtableAttachment[];
-  Responsavel?: string;
   Reservado?: boolean;
+  [key: string]: unknown;
 }
+
+interface AirtableCollaborator {
+  id: string;
+  name?: string;
+  email?: string;
+}
+
+const GIFT_FIELDS = {
+  reservedBy: process.env.AIRTABLE_GIFT_FIELD_RESERVED_BY ?? "Responsavel",
+  reserved: process.env.AIRTABLE_GIFT_FIELD_RESERVED ?? "Reservado",
+} as const;
 
 interface AirtableGiftRecord {
   id: string;
@@ -87,6 +98,21 @@ function getAirtableClient() {
   });
 }
 
+function getReservedByValue(fields: AirtableGiftFields): string | null {
+  const value = fields[GIFT_FIELDS.reservedBy];
+
+  if (typeof value === "string" && value.trim()) {
+    return value.trim();
+  }
+
+  if (value && typeof value === "object" && "name" in value) {
+    const collaborator = value as AirtableCollaborator;
+    return collaborator.name ?? null;
+  }
+
+  return null;
+}
+
 function mapGiftRecord(record: AirtableGiftRecord): Gift {
   const { fields } = record;
 
@@ -94,8 +120,8 @@ function mapGiftRecord(record: AirtableGiftRecord): Gift {
     id: record.id,
     name: fields.Nome ?? "Presente sem nome",
     photoUrl: fields.Foto?.[0]?.url ?? null,
-    reservedBy: fields.Responsavel ?? null,
-    isReserved: Boolean(fields.Reservado),
+    reservedBy: getReservedByValue(fields),
+    isReserved: Boolean(fields[GIFT_FIELDS.reserved]),
   };
 }
 
@@ -129,6 +155,49 @@ export async function createRsvp(payload: RsvpInput): Promise<void> {
         },
       ],
     });
+  } catch (error) {
+    if (error instanceof AirtableRequestError) {
+      throw error;
+    }
+
+    throw new AirtableRequestError(
+      getAirtableErrorMessage(error),
+      getAirtableErrorStatus(error),
+    );
+  }
+}
+
+export async function reserveGift(
+  giftId: string,
+  name: string,
+): Promise<Gift> {
+  try {
+    const client = getAirtableClient();
+    const tableName = process.env.AIRTABLE_PRESENTES_TABLE ?? "Presentes";
+    const encodedTable = encodeURIComponent(tableName);
+
+    const { data: existing } = await client.get<AirtableGiftRecord>(
+      `/${encodedTable}/${giftId}`,
+    );
+
+    if (existing.fields[GIFT_FIELDS.reserved]) {
+      throw new AirtableRequestError(
+        "Este presente já foi reservado por outra pessoa.",
+        409,
+      );
+    }
+
+    const { data: updated } = await client.patch<AirtableGiftRecord>(
+      `/${encodedTable}/${giftId}`,
+      {
+        fields: {
+          [GIFT_FIELDS.reservedBy]: name,
+          [GIFT_FIELDS.reserved]: true,
+        },
+      },
+    );
+
+    return mapGiftRecord(updated);
   } catch (error) {
     if (error instanceof AirtableRequestError) {
       throw error;

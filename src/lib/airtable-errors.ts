@@ -28,6 +28,17 @@ export function getAirtableErrorMessage(error: unknown): string {
   const airtableMessage = axiosError.response?.data?.error?.message;
 
   if (airtableMessage) {
+    if (
+      airtableMessage.includes("Cannot parse value") &&
+      airtableMessage.includes("Responsavel")
+    ) {
+      return `O campo Responsavel no Airtable está como colaborador (usuário) e não aceita nomes de convidados. Altere o tipo da coluna para "Texto em linha única" no Airtable.`;
+    }
+
+    if (airtableMessage.includes("Cannot resolve the user")) {
+      return `O campo Responsavel no Airtable está como colaborador (usuário). Altere o tipo da coluna para "Texto em linha única" no Airtable.`;
+    }
+
     if (airtableMessage.includes("cannot accept the provided value")) {
       return `${airtableMessage}. Confira o tipo do campo no Airtable (texto longo ou número).`;
     }
