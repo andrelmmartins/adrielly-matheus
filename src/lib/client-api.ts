@@ -14,6 +14,11 @@ export async function reserveGift(
   return data;
 }
 
+export async function unreserveGift(giftId: string): Promise<Gift> {
+  const { data } = await api.delete<Gift>(`/presentes/${giftId}`);
+  return data;
+}
+
 export async function submitRsvp(payload: RsvpInput): Promise<void> {
   await api.post("/rsvp", payload);
 }

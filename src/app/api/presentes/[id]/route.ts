@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { AirtableRequestError } from "@/lib/airtable-errors";
-import { reserveGift } from "@/lib/airtable";
+import { reserveGift, unreserveGift } from "@/lib/airtable";
 import type { ReserveGiftInput } from "@/types";
 
 interface RouteParams {
@@ -25,6 +25,23 @@ export async function PATCH(request: Request, { params }: RouteParams) {
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Erro ao reservar presente.";
+
+    const status =
+      error instanceof AirtableRequestError ? error.status : 500;
+
+    return NextResponse.json({ message }, { status });
+  }
+}
+
+export async function DELETE(_request: Request, { params }: RouteParams) {
+  try {
+    const { id } = await params;
+    const gift = await unreserveGift(id);
+
+    return NextResponse.json(gift);
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Erro ao desreservar presente.";
 
     const status =
       error instanceof AirtableRequestError ? error.status : 500;

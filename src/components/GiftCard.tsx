@@ -4,7 +4,7 @@ import {
   Badge,
   Box,
   Button,
-  Card,
+  Center,
   Dialog,
   Field,
   Image,
@@ -13,8 +13,14 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { reserveGift } from "@/lib/client-api";
+import { useState, useSyncExternalStore } from "react";
+import { reserveGift, unreserveGift } from "@/lib/client-api";
+import {
+  addReservedGift,
+  hasReservedGift,
+  removeReservedGift,
+  subscribeReservedGifts,
+} from "@/lib/reserved-gifts-cookie";
 import type { Gift } from "@/types";
 
 interface GiftCardProps {
@@ -26,12 +32,27 @@ export function GiftCard({ gift }: GiftCardProps) {
   const [guestName, setGuestName] = useState("");
   const queryClient = useQueryClient();
 
-  const mutation = useMutation({
+  const isMine = useSyncExternalStore(
+    subscribeReservedGifts,
+    () => hasReservedGift(gift.id),
+    () => false,
+  );
+
+  const reserveMutation = useMutation({
     mutationFn: (name: string) => reserveGift(gift.id, { name }),
     onSuccess: () => {
+      addReservedGift(gift.id);
       queryClient.invalidateQueries({ queryKey: ["gifts"] });
       setIsOpen(false);
       setGuestName("");
+    },
+  });
+
+  const unreserveMutation = useMutation({
+    mutationFn: () => unreserveGift(gift.id),
+    onSuccess: () => {
+      removeReservedGift(gift.id);
+      queryClient.invalidateQueries({ queryKey: ["gifts"] });
     },
   });
 
@@ -40,7 +61,7 @@ export function GiftCard({ gift }: GiftCardProps) {
 
     if (!details.open) {
       setGuestName("");
-      mutation.reset();
+      reserveMutation.reset();
     }
   };
 
@@ -51,155 +72,220 @@ export function GiftCard({ gift }: GiftCardProps) {
       return;
     }
 
-    mutation.mutate(guestName.trim());
+    reserveMutation.mutate(guestName.trim());
   };
+
+  const canUnreserve = gift.isReserved && isMine;
 
   return (
     <>
-      <Card.Root
+      <Box
         overflow="hidden"
-        borderRadius="2xl"
-        bg="offwhite"
-        border="1px solid"
-        borderColor="blush"
-        boxShadow="sm"
-        transition="transform 0.2s ease, box-shadow 0.2s ease"
+        borderRadius={{ base: "2xl", md: "3xl" }}
+        bg="pinkLight"
+        transition="transform 0.25s ease, box-shadow 0.25s ease"
         _hover={{ transform: "translateY(-4px)", boxShadow: "md" }}
+        h="full"
+        display="flex"
+        flexDirection="column"
       >
-        <Box position="relative" h="220px" bg="blush">
-          {gift.photoUrl ? (
-            <Image
-              src={gift.photoUrl}
-              alt={gift.name}
-              objectFit="cover"
-              w="full"
-              h="full"
-            />
-          ) : (
-            <Box
-              w="full"
-              h="full"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              bgGradient="to-br"
-              gradientFrom="peach"
-              gradientTo="sage"
-            >
-              <Text fontFamily="heading" fontSize="4xl" color="slate/40">
-                🎁
-              </Text>
-            </Box>
-          )}
+        <Box
+          p={{ base: 2.5, md: 5 }}
+          flex="1"
+          display="flex"
+          flexDirection="column"
+          gap={{ base: 2, md: 4 }}
+        >
+          <Center
+            position="relative"
+            h={{ base: "120px", md: "300px" }}
+            backgroundColor="#FFF"
+            p={{ base: 1.5, md: 2 }}
+            borderRadius="lg"
+          >
+            {gift.photoUrl ? (
+              <Image
+                src={gift.photoUrl}
+                alt={gift.name}
+                objectFit="contain"
+                borderRadius="lg"
+                h="full"
+              />
+            ) : (
+              <Box
+                w="full"
+                h="full"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+              >
+                <Text
+                  fontFamily="heading"
+                  fontSize={{ base: "lg", md: "3xl" }}
+                  color="beigeDark/50"
+                >
+                  Presente
+                </Text>
+              </Box>
+            )}
 
-          {gift.isReserved && (
-            <Badge
-              position="absolute"
-              top={3}
-              right={3}
-              bg="slate"
-              color="offwhite"
-              borderRadius="full"
-              px={3}
-              py={1}
-            >
-              Reservado
-            </Badge>
-          )}
-        </Box>
+            {gift.isReserved && (
+              <Badge
+                position="absolute"
+                top={{ base: 1.5, md: 3 }}
+                right={{ base: 1.5, md: 3 }}
+                bg="green"
+                color="white"
+                borderRadius="full"
+                px={{ base: 1.5, md: 3 }}
+                py={{ base: 0.5, md: 1 }}
+                fontFamily="heading"
+                fontSize={{ base: "2xs", md: "xs" }}
+              >
+                Reservado
+              </Badge>
+            )}
+          </Center>
 
-        <Card.Body p={5}>
           <Text
             fontFamily="heading"
-            fontSize="xl"
-            fontWeight="semibold"
-            color="slate"
-            mb={2}
+            fontSize={{ base: "sm", md: "xl" }}
+            color="beigeDark"
+            mb={{ base: 0, md: 2 }}
+            lineHeight="short"
+            flex="1"
+            lineClamp={2}
           >
             {gift.name}
           </Text>
 
-          <Text fontSize="sm" color="steel" mb={4}>
-            {gift.reservedBy
-              ? `Reservado por ${gift.reservedBy}`
-              : "Disponível para reserva"}
-          </Text>
-
-          {!gift.isReserved && (
+          {canUnreserve ? (
             <Button
               w="full"
-              bg="slate"
-              color="offwhite"
-              borderRadius="full"
-              _hover={{ bg: "steel" }}
-              onClick={() => setIsOpen(true)}
+              size={{ base: "xs", md: "md" }}
+              variant="outline"
+              borderColor="beigeMid"
+              color="beigeDark"
+              borderRadius={{ base: "lg", md: "xl" }}
+              fontFamily="heading"
+              fontSize={{ base: "xs", md: "md" }}
+              loading={unreserveMutation.isPending}
+              _hover={{ bg: "beigeLight", borderColor: "beigeDark" }}
+              onClick={() => unreserveMutation.mutate()}
             >
-              Reservar
+              Desreservar
+            </Button>
+          ) : (
+            <Button
+              w="full"
+              size={{ base: "xs", md: "md" }}
+              bg="pinkDark"
+              color="white"
+              borderRadius={{ base: "lg", md: "xl" }}
+              fontFamily="heading"
+              fontSize={{ base: "xs", md: "md" }}
+              px={{ base: 2, md: 4 }}
+              _hover={{ bg: "beigeDark" }}
+              onClick={() => setIsOpen(true)}
+              disabled={gift.isReserved}
+            >
+              <Text as="span" display={{ base: "none", md: "inline" }}>
+                {gift.isReserved
+                  ? `Reservado por ${gift.reservedBy}`
+                  : "Reservar"}
+              </Text>
+              <Text as="span" display={{ base: "inline", md: "none" }}>
+                {gift.isReserved ? "Reservado" : "Reservar"}
+              </Text>
             </Button>
           )}
-        </Card.Body>
-      </Card.Root>
 
-      <Dialog.Root open={isOpen} onOpenChange={handleOpenChange}>
+          {unreserveMutation.isError && (
+            <Text color="red.500" fontSize={{ base: "2xs", md: "sm" }}>
+              {unreserveMutation.error.message}
+            </Text>
+          )}
+        </Box>
+      </Box>
+
+      <Dialog.Root open={isOpen} onOpenChange={handleOpenChange} placement="center">
         <Portal>
-          <Dialog.Backdrop bg="blackAlpha.400" />
+          <Dialog.Backdrop bg="blackAlpha.300" backdropFilter="blur(4px)" />
           <Dialog.Positioner>
             <Dialog.Content
-              borderRadius="2xl"
-              bg="offwhite"
+              borderRadius="3xl"
+              bg="white"
               mx={4}
               maxW="md"
+              border="1px solid"
+              borderColor="pinkLight"
             >
               <Dialog.Header>
-                <Dialog.Title fontFamily="heading" color="slate">
+                <Dialog.Title
+                  fontFamily="heading"
+                  color="beigeDark"
+                  fontSize="2xl"
+                >
                   Reservar presente
                 </Dialog.Title>
               </Dialog.Header>
 
               <form onSubmit={handleSubmit}>
                 <Dialog.Body>
-                  <Text color="steel" mb={4}>
+                  <Text fontFamily="body" color="beigeMid" mb={4}>
                     Você está reservando{" "}
-                    <Text as="span" fontWeight="semibold" color="slate">
+                    <Text as="span" fontWeight="semibold" color="beigeDark">
                       {gift.name}
                     </Text>
-                    . Informe seu nome para que os noivos saibam quem irá
-                    presentear.
+                    . Informe seu nome para que saibamos quem irá presentear.
                   </Text>
 
                   <Field.Root required>
-                    <Field.Label color="slate">Seu nome</Field.Label>
+                    <Field.Label fontFamily="body" color="beigeDark">
+                      Seu nome
+                    </Field.Label>
                     <Input
                       value={guestName}
                       onChange={(event) => setGuestName(event.target.value)}
                       placeholder="Como você gostaria de aparecer"
-                      bg="white"
-                      borderColor="peach"
+                      bg="beigeLight"
+                      borderColor="beigeMid"
+                      borderRadius="xl"
                       autoFocus
-                      _focusVisible={{ borderColor: "slate", boxShadow: "none" }}
+                      _focusVisible={{
+                        borderColor: "pinkDark",
+                        boxShadow: "none",
+                      }}
                     />
                   </Field.Root>
 
-                  {mutation.isError && (
+                  {reserveMutation.isError && (
                     <Text color="red.500" fontSize="sm" mt={3}>
-                      {mutation.error.message}
+                      {reserveMutation.error.message}
                     </Text>
                   )}
                 </Dialog.Body>
 
                 <Dialog.Footer gap={3}>
                   <Dialog.ActionTrigger asChild>
-                    <Button variant="outline" borderColor="peach" color="slate">
+                    <Button
+                      variant="outline"
+                      borderColor="beigeMid"
+                      color="beigeDark"
+                      borderRadius="xl"
+                      fontFamily="heading"
+                    >
                       Cancelar
                     </Button>
                   </Dialog.ActionTrigger>
                   <Button
                     type="submit"
-                    bg="slate"
-                    color="offwhite"
-                    borderRadius="full"
-                    loading={mutation.isPending}
-                    _hover={{ bg: "steel" }}
+                    bg="pinkDark"
+                    color="white"
+                    borderRadius="xl"
+                    fontFamily="heading"
+                    loading={reserveMutation.isPending}
+                    _hover={{ bg: "beigeDark" }}
                   >
                     Confirmar reserva
                   </Button>

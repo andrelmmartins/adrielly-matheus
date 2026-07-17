@@ -1,19 +1,26 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Inter } from "next/font/google";
+import { DM_Mono, DM_Sans, DM_Serif_Display } from "next/font/google";
 import { Header } from "@/components/Header";
 import { AppProviders } from "@/components/providers/AppProviders";
 import { SITE_CONFIG } from "@/config/site";
 import "./globals.css";
 
-const cormorant = Cormorant_Garamond({
-  variable: "--font-cormorant",
+const dmSerifDisplay = DM_Serif_Display({
+  variable: "--font-dm-serif",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400"],
 });
 
-const inter = Inter({
-  variable: "--font-inter",
+const dmSans = DM_Sans({
+  variable: "--font-dm-sans",
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
+});
+
+const dmMono = DM_Mono({
+  variable: "--font-dm-mono",
+  subsets: ["latin"],
+  weight: ["400"],
 });
 
 export const metadata: Metadata = {
@@ -30,12 +37,12 @@ export default function RootLayout({
     <html
       lang="pt-BR"
       suppressHydrationWarning
-      className={`${cormorant.variable} ${inter.variable}`}
+      className={`${dmSerifDisplay.variable} ${dmSans.variable} ${dmMono.variable}`}
     >
       <body>
         <AppProviders>
           <Header />
-          <main style={{ minHeight: "100vh" }}>{children}</main>
+          <main>{children}</main>
         </AppProviders>
       </body>
     </html>

@@ -4,17 +4,18 @@ export const system = createSystem(defaultConfig, {
   theme: {
     tokens: {
       colors: {
-        slate: { value: "#7292A6" },
-        steel: { value: "#AAB8BB" },
-        sage: { value: "#C4D7D1" },
-        blush: { value: "#F2EBE9" },
-        offwhite: { value: "#F7F3F0" },
-        peach: { value: "#F5D1C3" },
-        salmon: { value: "#FFB6A3" },
+        white: { value: "#FFF5F3" },
+        pinkLight: { value: "#F9DDDE" },
+        pinkDark: { value: "#F2A2A9" },
+        beigeLight: { value: "#F8E6E1" },
+        beigeMid: { value: "#D7BFC0" },
+        beigeDark: { value: "#B58F91" },
+        green: { value: "#95A67C" },
       },
       fonts: {
-        heading: { value: "var(--font-cormorant), Georgia, serif" },
-        body: { value: "var(--font-inter), system-ui, sans-serif" },
+        heading: { value: "var(--font-dm-serif), Georgia, serif" },
+        body: { value: "var(--font-dm-sans), system-ui, sans-serif" },
+        mono: { value: "var(--font-dm-mono), ui-monospace, monospace" },
       },
     },
   },

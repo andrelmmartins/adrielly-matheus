@@ -210,3 +210,40 @@ export async function reserveGift(
   }
 }
 
+export async function unreserveGift(giftId: string): Promise<Gift> {
+  try {
+    const client = getAirtableClient();
+    const tableName = process.env.AIRTABLE_PRESENTES_TABLE ?? "Presentes";
+    const encodedTable = encodeURIComponent(tableName);
+
+    const { data: existing } = await client.get<AirtableGiftRecord>(
+      `/${encodedTable}/${giftId}`,
+    );
+
+    if (!existing.fields[GIFT_FIELDS.reserved]) {
+      throw new AirtableRequestError("Este presente não está reservado.", 409);
+    }
+
+    const { data: updated } = await client.patch<AirtableGiftRecord>(
+      `/${encodedTable}/${giftId}`,
+      {
+        fields: {
+          [GIFT_FIELDS.reservedBy]: null,
+          [GIFT_FIELDS.reserved]: false,
+        },
+      },
+    );
+
+    return mapGiftRecord(updated);
+  } catch (error) {
+    if (error instanceof AirtableRequestError) {
+      throw error;
+    }
+
+    throw new AirtableRequestError(
+      getAirtableErrorMessage(error),
+      getAirtableErrorStatus(error),
+    );
+  }
+}
+
