@@ -26,6 +26,17 @@ const dmMono = DM_Mono({
 export const metadata: Metadata = {
   title: SITE_CONFIG.title,
   description: SITE_CONFIG.description,
+  openGraph: {
+    title: SITE_CONFIG.title,
+    description: SITE_CONFIG.description,
+    images: [{ url: "/preview.png" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_CONFIG.title,
+    description: SITE_CONFIG.description,
+    images: ["/preview.png"],
+  },
 };
 
 export default function RootLayout({

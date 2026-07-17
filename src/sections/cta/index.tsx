@@ -38,7 +38,7 @@ export default function Cta() {
               <Box
                 as="span"
                 display="block"
-                fontSize={{ base: "5xl", lg: "7xl" }}
+                fontSize={{ base: "5xl", lg: "7xl", xl: "8xl" }}
                 color="beigeDark"
               >
                 Deixa
@@ -46,7 +46,7 @@ export default function Cta() {
               <Box
                 as="span"
                 display="block"
-                fontSize={{ base: "8xl", lg: "9xl" }}
+                fontSize={{ base: "8xl", lg: "9xl", xl: "9xl" }}
                 color="pinkDark"
                 my={{ base: 0, md: 1 }}
               >
@@ -55,7 +55,7 @@ export default function Cta() {
               <Box
                 as="span"
                 display="block"
-                fontSize={{ base: "5xl", lg: "7xl" }}
+                fontSize={{ base: "5xl", lg: "7xl", xl: "8xl" }}
                 color="beigeDark"
               >
                 sonhar em ti!
