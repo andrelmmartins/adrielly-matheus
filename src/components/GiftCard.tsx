@@ -247,7 +247,7 @@ export function GiftCard({ gift }: GiftCardProps) {
                     <Input
                       value={guestName}
                       onChange={(event) => setGuestName(event.target.value)}
-                      placeholder="Como você gostaria de aparecer"
+                      placeholder="Informe o seu nome"
                       bg="beigeLight"
                       borderColor="beigeMid"
                       borderRadius="xl"
