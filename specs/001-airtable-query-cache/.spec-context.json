@@ -1,0 +1,170 @@
+{
+  "workflow": "speckit",
+  "specName": "001-airtable-query-cache",
+  "branch": "001-airtable-query-cache",
+  "selectedAt": "2026-07-30T11:20:50.354Z",
+  "currentStep": "implement",
+  "status": "completed",
+  "history": [
+    {
+      "step": "implement",
+      "substep": null,
+      "kind": "start",
+      "by": "extension",
+      "at": "2026-07-30T11:23:11.006Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T001",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-07-30T11:24:05.881Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T002",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-07-30T11:24:06.142Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T003",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-07-30T11:24:06.353Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T004",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-07-30T11:24:06.568Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T005",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-07-30T11:24:06.799Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T006",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-07-30T11:24:59.408Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "kind": "complete",
+      "by": "extension",
+      "at": "2026-07-30T11:24:59.573Z"
+    }
+  ],
+  "currentTask": "T006",
+  "task_summaries": {
+    "T001": {
+      "status": "DONE",
+      "did": "staleTime 5 min (refetch on focus só após stale)",
+      "files": [
+        "src/components/providers/QueryProvider.tsx"
+      ]
+    },
+    "T002": {
+      "status": "DONE",
+      "did": "useQuery lista com chave [gifts] herdando política global",
+      "files": [
+        "src/sections/gifts/index.tsx"
+      ]
+    },
+    "T003": {
+      "status": "DONE",
+      "did": "reserva atualiza cache via setQueryData da resposta",
+      "files": [
+        "src/components/GiftCard.tsx"
+      ]
+    },
+    "T004": {
+      "status": "DONE",
+      "did": "desreserva atualiza cache via setQueryData da resposta",
+      "files": [
+        "src/components/GiftCard.tsx"
+      ]
+    },
+    "T005": {
+      "status": "DONE",
+      "did": "RSVP não invalida lista de presentes (confirmado)",
+      "files": [
+        "src/components/RsvpForm.tsx"
+      ]
+    },
+    "T006": {
+      "status": "DONE",
+      "did": "Validação estática: staleTime 5min, setQueryData sem invalidate, RSVP sem gifts",
+      "files": [
+        "src/components/providers/QueryProvider.tsx",
+        "src/components/GiftCard.tsx",
+        "src/components/RsvpForm.tsx",
+        "src/sections/gifts/index.tsx"
+      ]
+    }
+  },
+  "verified": [
+    {
+      "what": "política de cache e atualização pontual",
+      "command": "code review + ReadLints",
+      "result": "pass: staleTime 5min, setQueryData na reserva/desreserva, RSVP sem invalidate gifts",
+      "warnings": [
+        "tsc mostra erros pré-existentes em .next/dev/types de páginas removidas"
+      ]
+    }
+  ],
+  "decisions": [
+    {
+      "decision": "setQueryData com Gift da mutação em vez de invalidateQueries",
+      "why": "evita GET extra da lista a cada escrita (FR-006 / economia de cota)",
+      "rejected": "invalidateQueries após escrita"
+    },
+    {
+      "decision": "staleTime 5min com refetchOnWindowFocus default (true)",
+      "why": "enquanto fresco não refetcha no foco; após stale ainda permite refresh ao focar",
+      "rejected": "refetchOnWindowFocus false permanente"
+    }
+  ],
+  "coverage": {
+    "FR-001": {
+      "tests": [
+        "static::staleTime QueryProvider"
+      ]
+    },
+    "FR-004": {
+      "tests": [
+        "static::GiftCard setQueryData reserve"
+      ]
+    },
+    "FR-005": {
+      "tests": [
+        "static::GiftCard setQueryData unreserve"
+      ]
+    },
+    "FR-007": {
+      "tests": [
+        "static::RsvpForm no gifts invalidate"
+      ]
+    }
+  },
+  "step_summaries": {
+    "implement": {
+      "summary": "Cache da lista: staleTime 5min e setQueryData pós reserva/desreserva"
+    }
+  },
+  "last_action": "all tasks done — T001-T006 validated statically"
+}

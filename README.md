@@ -2,6 +2,8 @@
 
 Site para o **chá de cozinha** e o **casamento** de Adrielly e Matheus. Os convidados podem consultar a lista de presentes e confirmar presença nos eventos.
 
+Desenvolvimento orientado a specs via [GitHub Spec Kit](https://github.com/github/spec-kit): princípios em `.specify/memory/constitution.md`.
+
 ## Funcionalidades
 
 - **Lista de presentes** — visualizar itens e reservar o que deseja levar.

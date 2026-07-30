@@ -8,6 +8,8 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 Site para o chá de cozinha e o casamento de Adrielly e Matheus. O foco é simplicidade: duas funcionalidades principais, sem backend próprio.
 
+Governança Spec Kit: princípios não negociáveis em `.specify/memory/constitution.md` (use `/speckit-constitution` para emendas).
+
 ## Funcionalidades
 
 1. **Lista de presentes** — convidados visualizam itens disponíveis e podem reservar/comprar presentes.

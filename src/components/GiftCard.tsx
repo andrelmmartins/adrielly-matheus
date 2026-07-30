@@ -38,11 +38,23 @@ export function GiftCard({ gift }: GiftCardProps) {
     () => false,
   );
 
+  const updateGiftInCache = (updated: Gift) => {
+    queryClient.setQueryData<Gift[]>(["gifts"], (current: Gift[] | undefined) => {
+      if (!current) {
+        return current;
+      }
+
+      return current.map((item: Gift) =>
+        item.id === updated.id ? updated : item,
+      );
+    });
+  };
+
   const reserveMutation = useMutation({
     mutationFn: (name: string) => reserveGift(gift.id, { name }),
-    onSuccess: () => {
+    onSuccess: (updated) => {
       addReservedGift(gift.id);
-      queryClient.invalidateQueries({ queryKey: ["gifts"] });
+      updateGiftInCache(updated);
       setIsOpen(false);
       setGuestName("");
     },
@@ -50,9 +62,9 @@ export function GiftCard({ gift }: GiftCardProps) {
 
   const unreserveMutation = useMutation({
     mutationFn: () => unreserveGift(gift.id),
-    onSuccess: () => {
+    onSuccess: (updated) => {
       removeReservedGift(gift.id);
-      queryClient.invalidateQueries({ queryKey: ["gifts"] });
+      updateGiftInCache(updated);
     },
   });
 
