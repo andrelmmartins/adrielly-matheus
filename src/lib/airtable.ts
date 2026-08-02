@@ -132,6 +132,12 @@ export async function getGifts(): Promise<Gift[]> {
 
     const { data } = await client.get<AirtableListResponse<AirtableGiftRecord>>(
       `/${encodeURIComponent(tableName)}`,
+      {
+        params: {
+          "sort[0][field]": GIFT_FIELDS.reserved,
+          "sort[0][direction]": "asc",
+        },
+      },
     );
 
     return data.records.map(mapGiftRecord);

@@ -122,6 +122,8 @@ export function GiftCard({ gift }: GiftCardProps) {
                 objectFit="contain"
                 borderRadius="lg"
                 h="full"
+                opacity={gift.isReserved ? 0.45 : 1}
+                transition="opacity 0.2s ease"
               />
             ) : (
               <Box
@@ -130,6 +132,7 @@ export function GiftCard({ gift }: GiftCardProps) {
                 display="flex"
                 alignItems="center"
                 justifyContent="center"
+                opacity={gift.isReserved ? 0.45 : 1}
               >
                 <Text
                   fontFamily="heading"
@@ -201,7 +204,12 @@ export function GiftCard({ gift }: GiftCardProps) {
               onClick={() => setIsOpen(true)}
               disabled={gift.isReserved}
             >
-              <Text as="span" display={{ base: "none", md: "inline" }}>
+              <Text
+                as="span"
+                display={{ base: "none", md: "block" }}
+                truncate
+                maxW="100%"
+              >
                 {gift.isReserved
                   ? `Reservado por ${gift.reservedBy}`
                   : "Reservar"}
